@@ -31,25 +31,25 @@ const TURNO_VACIO: FormularioTurnoType = {
 
 // Estilo compartido para los campos del formulario
 const estiloInput: React.CSSProperties = {
-  border: '1.5px solid rgba(180,130,100,0.3)',
+  border: '1px solid rgba(226,232,240,0.8)',
   backgroundColor: '#fff',
-  color: '#3a2010',
-  fontFamily: "'Georgia', serif",
-  borderRadius: '0.75rem',
-  padding: '0.625rem 1rem',
+  color: '#0f172a',
+  fontFamily: "'-apple-system', 'BlinkMacSystemFont', 'Segoe UI', sans-serif",
+  borderRadius: '0.5rem',
+  padding: '0.625rem 0.875rem',
   width: '100%',
   fontSize: '0.875rem',
   outline: 'none',
-  transition: 'border-color 0.15s',
+  transition: 'border-color 0.15s, box-shadow 0.15s',
 };
 
 const estiloLabel: React.CSSProperties = {
   display: 'block',
-  fontSize: '0.7rem',
+  fontSize: '0.75rem',
   fontWeight: 600,
   textTransform: 'uppercase',
-  letterSpacing: '0.1em',
-  color: '#7a5040',
+  letterSpacing: '0.05em',
+  color: '#64748b',
   marginBottom: '0.375rem',
 };
 
@@ -122,8 +122,8 @@ export const FormularioTurno = ({
           disabled={ocupado}
           onChange={(e) => set('fecha', e.target.value)}
           style={estiloInput}
-          onFocus={(e) => (e.target.style.borderColor = '#b87c5a')}
-          onBlur={(e) => (e.target.style.borderColor = 'rgba(180,130,100,0.3)')}
+          onFocus={(e) => (e.target.style.borderColor = '#2563eb')}
+          onBlur={(e) => (e.target.style.borderColor = 'rgba(226,232,240,0.8)')}
         />
       </div>
 
@@ -137,8 +137,8 @@ export const FormularioTurno = ({
             disabled={ocupado}
             onChange={(e) => set('horaInicio', e.target.value)}
             style={estiloInput}
-            onFocus={(e) => (e.target.style.borderColor = '#b87c5a')}
-            onBlur={(e) => (e.target.style.borderColor = 'rgba(180,130,100,0.3)')}
+            onFocus={(e) => (e.target.style.borderColor = '#2563eb')}
+            onBlur={(e) => (e.target.style.borderColor = 'rgba(226,232,240,0.8)')}
           />
         </div>
         <div>
@@ -149,8 +149,8 @@ export const FormularioTurno = ({
             disabled={ocupado}
             onChange={(e) => set('horaFin', e.target.value)}
             style={estiloInput}
-            onFocus={(e) => (e.target.style.borderColor = '#b87c5a')}
-            onBlur={(e) => (e.target.style.borderColor = 'rgba(180,130,100,0.3)')}
+            onFocus={(e) => (e.target.style.borderColor = '#2563eb')}
+            onBlur={(e) => (e.target.style.borderColor = 'rgba(226,232,240,0.8)')}
           />
         </div>
       </div>
@@ -166,8 +166,8 @@ export const FormularioTurno = ({
           disabled={ocupado}
           onChange={(e) => set('capacidadMaxima', parseInt(e.target.value) || 1)}
           style={estiloInput}
-          onFocus={(e) => (e.target.style.borderColor = '#b87c5a')}
-          onBlur={(e) => (e.target.style.borderColor = 'rgba(180,130,100,0.3)')}
+          onFocus={(e) => (e.target.style.borderColor = '#2563eb')}
+          onBlur={(e) => (e.target.style.borderColor = 'rgba(226,232,240,0.8)')}
         />
       </div>
 
@@ -180,8 +180,8 @@ export const FormularioTurno = ({
             disabled={ocupado}
             onChange={(e) => set('estado', e.target.value as 'activo' | 'inactivo')}
             style={estiloInput}
-            onFocus={(e) => (e.target.style.borderColor = '#b87c5a')}
-            onBlur={(e) => (e.target.style.borderColor = 'rgba(180,130,100,0.3)')}
+            onFocus={(e) => (e.target.style.borderColor = '#2563eb')}
+            onBlur={(e) => (e.target.style.borderColor = 'rgba(226,232,240,0.8)')}
           >
             <option value="activo">Activo</option>
             <option value="inactivo">Inactivo</option>
@@ -194,9 +194,9 @@ export const FormularioTurno = ({
         <p
           className="text-xs px-3 py-2 rounded-lg"
           style={{
-            backgroundColor: '#fff5f5',
-            color: '#c0392b',
-            border: '1px solid #fecdca',
+            backgroundColor: '#fef2f2',
+            color: '#991b1b',
+            border: '1px solid #fecaca',
           }}
         >
           {error}
@@ -208,10 +208,11 @@ export const FormularioTurno = ({
         <button
           onClick={onCancel}
           disabled={ocupado}
-          className="flex-1 py-2.5 rounded-xl text-sm transition-all disabled:opacity-50"
+          className="flex-1 py-2.5 rounded-lg text-sm font-medium transition-all disabled:opacity-50"
           style={{
-            border: '1.5px solid rgba(180,130,100,0.3)',
-            color: '#9a7060',
+            border: '1px solid rgba(226,232,240,0.8)',
+            color: '#64748b',
+            backgroundColor: '#fff',
           }}
         >
           Cancelar
@@ -219,10 +220,10 @@ export const FormularioTurno = ({
         <button
           onClick={handleSubmit}
           disabled={ocupado}
-          className="flex-1 py-2.5 rounded-xl text-sm font-medium text-white transition-all disabled:opacity-60"
+          className="flex-1 py-2.5 rounded-lg text-sm font-medium text-white transition-all disabled:opacity-60"
           style={{
-            background: 'linear-gradient(135deg, #8b5c3e, #a0725a)',
-            boxShadow: '0 2px 8px rgba(139,92,62,0.3)',
+            background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+            boxShadow: '0 2px 8px rgba(37,99,235,0.3)',
           }}
         >
           {enviando

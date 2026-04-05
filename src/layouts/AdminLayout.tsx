@@ -20,185 +20,151 @@ export const AdminLayout = () => {
     navigate('/login', { replace: true });
   };
 
-  // Clases base y activa para los NavLinks del menú.
-  // NavLink recibe una función como className que expone
-  // el flag isActive, que es true cuando la ruta coincide.
-  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-    [
-      'relative px-5 py-2 text-sm tracking-wide transition-all duration-200 rounded-full',
-      isActive
-        ? 'text-white shadow-md'
-        : 'hover:bg-white/10',
-    ].join(' ');
-
   return (
     <div
       className="min-h-screen flex flex-col"
-      style={{
-        fontFamily: "'Georgia', 'Times New Roman', serif",
-        backgroundColor: '#fdf6f0',
-      }}
+      style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
     >
-
-      {/* ── Header / Navbar ── */}
-      <header
-        className="w-full px-6 py-0 flex items-center justify-between gap-4"
+      {/* ── Fondo ── */}
+      <div
+        className="fixed inset-0 -z-10"
         style={{
-          background: 'linear-gradient(135deg, #6b3f28 0%, #8b5c3e 60%, #a0725a 100%)',
-          minHeight: '64px',
-          boxShadow: '0 2px 16px rgba(107, 63, 40, 0.25)',
+          background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 40%, #f8fafc 100%)',
         }}
       >
+        <div
+          className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%)',
+            transform: 'translate(30%, -30%)',
+            filter: 'blur(70px)',
+          }}
+        />
+        <div
+          className="absolute bottom-0 left-0 w-96 h-96 rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(14,165,233,0.08) 0%, transparent 70%)',
+            transform: 'translate(-30%, 30%)',
+            filter: 'blur(60px)',
+          }}
+        />
+      </div>
 
+      {/* ── Header ── */}
+      <header
+        className="w-full px-8 flex items-center justify-between shrink-0"
+        style={{
+          height: '62px',
+          borderBottom: '1px solid rgba(226,232,240,0.9)',
+          backgroundColor: 'rgba(255,255,255,0.97)',
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          position: 'sticky',
+          top: 0,
+          zIndex: 40,
+        }}
+      >
         {/* Logo */}
         <button
           onClick={() => navigate('/admin/turnos')}
-          className="flex items-center gap-3 group shrink-0"
+          className="flex items-center"
         >
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shadow transition-transform group-hover:scale-105"
-            style={{
-              background: 'rgba(255,255,255,0.15)',
-              border: '1px solid rgba(255,255,255,0.3)',
-              color: '#fff',
-              letterSpacing: '0.05em',
-            }}
+          <span
+            className="text-lg font-bold"
+            style={{ color: '#0f172a', letterSpacing: '-0.02em' }}
           >
-            BB
-          </div>
-          <div className="flex flex-col leading-tight">
-            <span
-              className="text-sm font-bold text-white tracking-wide"
-              style={{ letterSpacing: '0.06em' }}
-            >
-              BeautyBrows
-            </span>
-            <span
-              className="text-xs text-white/60 uppercase tracking-widest"
-              style={{ fontSize: '0.6rem', letterSpacing: '0.18em' }}
-            >
-              Panel Admin
-            </span>
-          </div>
+            BeautyBrows
+          </span>
         </button>
 
-        {/* ── Navegación central ── */}
-        <nav className="flex items-center gap-1">
-
-          <NavLink to="/admin/turnos" className={navLinkClass} end>
+        {/* Navegación central */}
+        <nav className="hidden md:flex items-center gap-8">
+          <NavLink
+            to="/admin/turnos"
+            className={({ isActive }) =>
+              isActive ? 'font-semibold' : ''
+            }
+            end
+          >
             {({ isActive }) => (
-              <>
-                {/* Pill de fondo cuando está activo */}
-                {isActive && (
-                  <span
-                    className="absolute inset-0 rounded-full"
-                    style={{ background: 'rgba(255,255,255,0.2)' }}
-                  />
-                )}
-                <span className="relative flex items-center gap-2 text-white">
-                  <span style={{ fontSize: '0.85rem' }}>🗓</span>
-                  Turnos
-                </span>
-              </>
+              <span
+                className="text-sm transition-colors"
+                style={{
+                  color: isActive ? '#2563eb' : '#64748b',
+                  borderBottom: isActive ? '2px solid #2563eb' : '2px solid transparent',
+                  paddingBottom: '2px',
+                  display: 'block',
+                }}
+              >
+                Turnos
+              </span>
             )}
           </NavLink>
 
-          <NavLink to="/admin/reservas" className={navLinkClass} end>
+          <NavLink
+            to="/admin/reservas"
+            className={({ isActive }) =>
+              isActive ? 'font-semibold' : ''
+            }
+            end
+          >
             {({ isActive }) => (
-              <>
-                {isActive && (
-                  <span
-                    className="absolute inset-0 rounded-full"
-                    style={{ background: 'rgba(255,255,255,0.2)' }}
-                  />
-                )}
-                <span className="relative flex items-center gap-2 text-white">
-                  <span style={{ fontSize: '0.85rem' }}>📋</span>
-                  Reservas
-                </span>
-              </>
+              <span
+                className="text-sm transition-colors"
+                style={{
+                  color: isActive ? '#2563eb' : '#64748b',
+                  borderBottom: isActive ? '2px solid #2563eb' : '2px solid transparent',
+                  paddingBottom: '2px',
+                  display: 'block',
+                }}
+              >
+                Reservas
+              </span>
             )}
           </NavLink>
-
         </nav>
 
-        {/* ── Usuario + Logout ── */}
-        <div className="flex items-center gap-3 shrink-0">
-
-          {/* Email del usuario logueado */}
-          <div className="hidden sm:flex flex-col items-end leading-tight">
-            <span className="text-xs text-white/50 uppercase tracking-widest" style={{ fontSize: '0.6rem' }}>
-              Sesión activa
-            </span>
-            <span className="text-xs text-white/80 truncate max-w-[160px]">
+        {/* Usuario + Logout */}
+        <div className="flex items-center gap-4">
+          <div className="hidden sm:flex flex-col items-end">
+            <span className="text-xs" style={{ color: '#94a3b8', letterSpacing: '0.05em' }}>
               {user?.email}
             </span>
           </div>
 
-          {/* Separador */}
-          <div className="w-px h-6 bg-white/20 hidden sm:block" />
-
-          {/* Botón logout */}
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs text-white/80 transition-all duration-200 hover:text-white hover:bg-white/15"
-            style={{
-              border: '1px solid rgba(255,255,255,0.2)',
-              letterSpacing: '0.04em',
-            }}
+            className="text-sm font-semibold transition-colors hover:opacity-80"
+            style={{ color: '#2563eb' }}
           >
-            <span style={{ fontSize: '0.8rem' }}>→</span>
-            <span>Salir</span>
+            Salir
           </button>
         </div>
       </header>
 
-      {/* ── Indicador de ruta activa (breadcrumb mínimo) ── */}
-      <div
-        className="w-full px-6 py-2 flex items-center gap-2 text-xs"
-        style={{
-          borderBottom: '1px solid rgba(180, 130, 100, 0.15)',
-          color: '#b87c5a',
-          backgroundColor: 'rgba(253, 246, 240, 0.9)',
-          letterSpacing: '0.06em',
-        }}
-      >
-        <span>Admin</span>
-        <span style={{ color: '#d4a88a' }}>›</span>
-        <NavLink
-          to="/admin/turnos"
-          className={({ isActive }) =>
-            isActive ? 'font-semibold text-amber-800' : 'hover:text-amber-800'
-          }
-        >
-          Turnos
-        </NavLink>
-        <NavLink
-          to="/admin/reservas"
-          className={({ isActive }) =>
-            isActive ? 'font-semibold text-amber-800' : 'hover:text-amber-800'
-          }
-          style={({ isActive }) => (isActive ? {} : { display: 'none' })}
-        >
-          › Reservas
-        </NavLink>
-      </div>
-
       {/* ── Contenido de la página activa ── */}
-      <main className="flex-1 p-6 max-w-7xl w-full mx-auto">
-        <Outlet />
+      <main className="flex-1 flex flex-col p-6">
+        <div className="max-w-7xl w-full mx-auto">
+          <Outlet />
+        </div>
       </main>
 
       {/* ── Footer ── */}
       <footer
-        className="w-full px-6 py-3 text-center text-xs"
+        className="w-full px-8 py-6 shrink-0"
         style={{
-          borderTop: '1px solid rgba(180, 130, 100, 0.15)',
-          color: '#b87c5a',
-          letterSpacing: '0.08em',
+          borderTop: '1px solid rgba(226,232,240,0.9)',
+          backgroundColor: 'rgba(255,255,255,0.95)',
         }}
       >
-        BeautyBrows Studio · Panel de Administración
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+          <span className="text-sm font-bold" style={{ color: '#0f172a' }}>
+            BeautyBrows · Panel Admin
+          </span>
+          <span className="text-xs" style={{ color: '#94a3b8', letterSpacing: '0.05em' }}>
+            © {new Date().getFullYear()} BEAUTYBROWS STUDIO. TODOS LOS DERECHOS RESERVADOS.
+          </span>
+        </div>
       </footer>
     </div>
   );

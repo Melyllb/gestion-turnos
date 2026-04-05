@@ -18,10 +18,10 @@ interface FormularioReservaProps {
 }
 
 const estiloInput: React.CSSProperties = {
-  border: '1.5px solid rgba(180,130,100,0.3)',
+  border: '1.5px solid rgba(59,130,246,0.2)',
   backgroundColor: '#fff',
-  color: '#3a2010',
-  fontFamily: "'Georgia', serif",
+  color: '#1e293b',
+  fontFamily: "'Inter', sans-serif",
   borderRadius: '0.75rem',
   padding: '0.625rem 1rem',
   width: '100%',
@@ -36,9 +36,11 @@ const estiloLabel: React.CSSProperties = {
   fontWeight: 600,
   textTransform: 'uppercase',
   letterSpacing: '0.1em',
-  color: '#7a5040',
+  color: '#475569',
   marginBottom: '0.375rem',
 };
+
+
 
 export const FormularioReserva = ({ onSubmit, onCancel }: FormularioReservaProps) => {
   const [datos, setDatos] = useState<FormularioReservaType>({
@@ -163,9 +165,9 @@ export const FormularioReserva = ({ onSubmit, onCancel }: FormularioReservaProps
           disabled={enviando}
           className="flex-1 py-2.5 rounded-xl text-sm transition-all disabled:opacity-50"
           style={{
-            border: '1.5px solid rgba(180,130,100,0.3)',
-            color: '#9a7060',
-          }}
+  background: 'linear-gradient(135deg, #2563eb, #1e40af)',
+  boxShadow: '0 2px 8px rgba(37, 99, 235, 0.3)',
+}}
         >
           Cancelar
         </button>
