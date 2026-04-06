@@ -126,6 +126,14 @@ export const AdminLayout = () => {
 
         {/* Usuario + Logout */}
         <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate('/')}
+            className="text-sm font-semibold transition-colors hover:opacity-80"
+            style={{ color: '#2563eb' }}
+          >
+            Turnos disponibles
+          </button>
+
           <div className="hidden sm:flex flex-col items-end">
             <span className="text-xs" style={{ color: '#94a3b8', letterSpacing: '0.05em' }}>
               {user?.email}

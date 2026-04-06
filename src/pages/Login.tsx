@@ -132,7 +132,7 @@
 //   );
 // };
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
@@ -141,7 +141,7 @@ export const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -162,6 +162,12 @@ export const Login = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/admin/turnos', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   return (
     <div className="flex-1 flex items-center justify-center px-6 py-12">

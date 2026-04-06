@@ -49,7 +49,7 @@ const ModalDetalleCliente = ({ reserva, onClose, onCancelar }: ModalDetalleClien
       titulo="Detalles del Cliente"
       subtitulo={`Reserva #${reserva.id}`}
       onClose={onClose}
-      ancho="md"
+      ancho="xl"
     >
       <div className="flex flex-col gap-5">
         {/* Información del cliente */}

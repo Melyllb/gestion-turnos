@@ -3,6 +3,7 @@ import { useTurnos } from '../hooks/useTurnos';
 import { useReservas } from '../hooks/useReservas';
 import { Modal } from '../components/Modal';
 import { FormularioReserva } from '../components/FormularioReserva';
+import calendarIcon from '../assets/calendar_month_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.png';
 import type { TurnoConDisponibilidad, FormularioReserva as FormularioReservaType } from '../types';
 
 // ============================================================
@@ -83,7 +84,9 @@ const Calendario = ({ fechaSeleccionada, onSeleccionar, fechasConTurnos }: Calen
       {/* Cabecera del calendario */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <span style={{ fontSize: '1rem' }}>📅</span>
+          <span style={{ fontSize: '1rem' }}>
+            <img src={calendarIcon} alt="calendar" />
+          </span>
           <span className="font-semibold text-sm" style={{ color: '#0f172a' }}>
             {MESES[mes.getMonth()]} {mes.getFullYear()}
           </span>
@@ -209,11 +212,11 @@ const Calendario = ({ fechaSeleccionada, onSeleccionar, fechasConTurnos }: Calen
 
 interface TarjetaTurnoProps {
   turno: TurnoConDisponibilidad;
-  seleccionado: boolean;
+  seleccionado?: boolean;
   onReservar: (turno: TurnoConDisponibilidad) => void;
 }
 
-const TarjetaTurno = ({ turno, seleccionado, onReservar }: TarjetaTurnoProps) => {
+const TarjetaTurno = ({ turno, seleccionado = false, onReservar }: TarjetaTurnoProps) => {
   const sinCupos = turno.cuposDisponibles <= 0;
   const pocoCupo = turno.cuposDisponibles <= 2 && turno.cuposDisponibles > 0;
 
@@ -310,8 +313,9 @@ export const TurnosDisponibles = () => {
   const { crearReserva } = useReservas();
 
   const [fechaSeleccionada, setFechaSeleccionada] = useState<string>(hoy());
-  const [turnoSeleccionado, setTurnoSeleccionado] = useState<TurnoConDisponibilidad | null>(null);
   const [turnoParaReservar, setTurnoParaReservar] = useState<TurnoConDisponibilidad | null>(null);
+  // Dentro del componente TurnosDisponibles, agrega este estado
+const [filtroHorario, setFiltroHorario] = useState<'todas' | 'manana' | 'tarde'>('todas');
 
   // Fechas que tienen al menos un turno activo con cupos disponibles
   const fechasConTurnos = useMemo(() => {
@@ -328,13 +332,25 @@ export const TurnosDisponibles = () => {
       .filter((t) => t.estado === 'activo' && t.cuposDisponibles > 0 && t.fecha === fechaSeleccionada)
       .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
   }, [turnos, fechaSeleccionada]);
-
+// Dentro del componente TurnosDisponibles, después de obtener turnosDelDia
+const turnosFiltrados = useMemo(() => {
+  if (filtroHorario === 'todas') return turnosDelDia;
+  
+  return turnosDelDia.filter(turno => {
+    const hora = parseInt(turno.horaInicio.split(':')[0]);
+    const esManana = hora < 12; // Antes de las 12:00 es mañana
+    const esTarde = hora >= 12;  // 12:00 o después es tarde
+    
+    if (filtroHorario === 'manana') return esManana;
+    if (filtroHorario === 'tarde') return esTarde;
+    return true;
+  });
+}, [turnosDelDia, filtroHorario]);
   // const handleSeleccionarTurno = (turno: TurnoConDisponibilidad) => {
   //   setTurnoSeleccionado((prev) => (prev?.id === turno.id ? null : turno));
   // };
 
   const handleAbrirModal = (turno: TurnoConDisponibilidad) => {
-    setTurnoSeleccionado(turno);
     setTurnoParaReservar(turno);
   };
 
@@ -430,130 +446,74 @@ export const TurnosDisponibles = () => {
                   {fechaFormateada}
                 </p>
               </div>
-
-              {/* Filtro mañana/tarde */}
-              <div
-                className="flex rounded-xl overflow-hidden"
-                style={{ border: '1px solid rgba(226,232,240,0.9)' }}
-              >
-                {['Mañana', 'Tarde'].map((label) => (
-                  <span
-                    key={label}
-                    className="px-3 py-1.5 text-xs font-medium"
-                    style={{ color: '#64748b', backgroundColor: '#f8fafc' }}
-                  >
-                    {label.toUpperCase()}
-                  </span>
-                ))}
-              </div>
+<div
+  className="flex rounded-xl overflow-hidden"
+  style={{ border: '1px solid rgba(226,232,240,0.9)' }}
+>
+  <button
+    onClick={() => setFiltroHorario('todas')}
+    className="px-3 py-1.5 text-xs font-medium transition-all"
+    style={{
+      color: filtroHorario === 'todas' ? '#fff' : '#64748b',
+      backgroundColor: filtroHorario === 'todas' ? '#2563eb' : '#f8fafc',
+    }}
+  >
+    TODAS
+  </button>
+  <button
+    onClick={() => setFiltroHorario('manana')}
+    className="px-3 py-1.5 text-xs font-medium transition-all"
+    style={{
+      color: filtroHorario === 'manana' ? '#fff' : '#64748b',
+      backgroundColor: filtroHorario === 'manana' ? '#2563eb' : '#f8fafc',
+    }}
+  >
+    MAÑANA
+  </button>
+  <button
+    onClick={() => setFiltroHorario('tarde')}
+    className="px-3 py-1.5 text-xs font-medium transition-all"
+    style={{
+      color: filtroHorario === 'tarde' ? '#fff' : '#64748b',
+      backgroundColor: filtroHorario === 'tarde' ? '#2563eb' : '#f8fafc',
+    }}
+  >
+    TARDE
+  </button>
+</div>
             </div>
-
-            {/* Grid de turnos */}
-            {turnosDelDia.length === 0 ? (
-              <div
-                className="flex flex-col items-center justify-center py-16 rounded-xl"
-                style={{
-                  backgroundColor: '#f8fafc',
-                  border: '1px dashed rgba(226,232,240,0.9)',
-                }}
-              >
-                <span className="text-3xl mb-3">🗓</span>
-                <p className="font-medium text-sm mb-1" style={{ color: '#475569' }}>
-                  Sin turnos para este día
-                </p>
-                <p className="text-xs" style={{ color: '#94a3b8' }}>
-                  Selecciona otra fecha en el calendario
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-                {turnosDelDia.map((turno) => (
-                  <TarjetaTurno
-                    key={turno.id}
-                    turno={turno}
-                    seleccionado={turnoSeleccionado?.id === turno.id}
-                    onReservar={handleAbrirModal}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Barra inferior: acción principal */}
-            {turnoSeleccionado && turnosDelDia.length > 0 && (
-              <div
-                className="mt-5 pt-5 flex items-center justify-between"
-                style={{ borderTop: '1px solid rgba(226,232,240,0.8)' }}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-9 h-9 rounded-full flex items-center justify-center text-sm"
-                    style={{ backgroundColor: '#dbeafe', color: '#1d4ed8' }}
-                  >
-                    ✦
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold" style={{ color: '#0f172a' }}>
-                      Especialista disponible
-                    </p>
-                    <p className="text-xs" style={{ color: '#94a3b8' }}>
-                      Turno: {turnoSeleccionado.horaInicio} – {turnoSeleccionado.horaFin}
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setTurnoParaReservar(turnoSeleccionado)}
-                  className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
-                  style={{
-                    background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
-                    boxShadow: '0 2px 12px rgba(37,99,235,0.3)',
-                  }}
-                >
-                  Continuar con la reserva →
-                </button>
-              </div>
-            )}
+{turnosFiltrados.length === 0 ? (
+  <div
+    className="flex flex-col items-center justify-center py-16 rounded-xl"
+    style={{
+      backgroundColor: '#f8fafc',
+      border: '1px dashed rgba(226,232,240,0.9)',
+    }}
+  >
+    <span className="text-4xl mb-3">⏰</span>
+    <p className="font-medium text-sm mb-1" style={{ color: '#475569' }}>
+      No hay turnos en este horario
+    </p>
+    <p className="text-xs" style={{ color: '#94a3b8' }}>
+      {filtroHorario === 'manana' 
+        ? 'No hay turnos disponibles por la mañana' 
+        : filtroHorario === 'tarde' 
+        ? 'No hay turnos disponibles por la tarde'
+        : 'No hay turnos para este día'}
+    </p>
+  </div>
+) : (
+  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+    {turnosFiltrados.map((turno) => (
+      <TarjetaTurno
+        key={turno.id}
+        turno={turno}
+        onReservar={handleAbrirModal}
+      />
+    ))}
+  </div>
+)}
           </div>
-        </div>
-
-        {/* ── Sección de garantías ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
-          {[
-            {
-              icon: '🛡',
-              titulo: 'Experiencia garantizada',
-              desc: 'Nuestros turnos incluyen una consulta completa para asegurar que tu visión se realice con precisión.',
-            },
-            {
-              icon: '✨',
-              titulo: 'Salud & bienestar',
-              desc: 'Mantenemos los más altos estándares de higiene en nuestro estudio para tu seguridad y comodidad.',
-            },
-          ].map(({ icon, titulo, desc }) => (
-            <div
-              key={titulo}
-              className="flex items-start gap-4 p-5 rounded-2xl"
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.8)',
-                border: '1px solid rgba(226,232,240,0.8)',
-              }}
-            >
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0"
-                style={{ backgroundColor: '#eff6ff' }}
-              >
-                {icon}
-              </div>
-              <div>
-                <p className="text-sm font-semibold mb-1" style={{ color: '#0f172a' }}>
-                  {titulo}
-                </p>
-                <p className="text-xs leading-relaxed" style={{ color: '#64748b' }}>
-                  {desc}
-                </p>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
 

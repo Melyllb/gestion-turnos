@@ -54,7 +54,7 @@ const DialogoConfirmacion = ({
 );
 
 export const AdminTurnos = () => {
-  const { turnos, cargando, error, crearTurno, editarTurno, eliminarTurno } = useTurnos();
+  const { turnos, cargando, error, crearTurno, editarTurno, eliminarTurno, recargar } = useTurnos();
 
   const [modalAbierto, setModalAbierto] = useState(false);
   const [turnoEditando, setTurnoEditando] = useState<TurnoConDisponibilidad | null>(null);
@@ -106,6 +106,7 @@ export const AdminTurnos = () => {
     try {
       setCargandoAccion(true);
       await eliminarTurno(eliminandoId);
+      await recargar();
       setEliminandoId(null);
     } catch (e) {
       setErrorModal(e instanceof Error ? e.message : 'Error al eliminar el turno');

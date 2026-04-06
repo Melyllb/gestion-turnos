@@ -61,7 +61,7 @@ export const FormularioReserva = ({ onSubmit, onCancel }: FormularioReservaProps
     if (!datos.nombreCliente.trim()) return 'El nombre completo es obligatorio';
     if (datos.nombreCliente.trim().length < 3) return 'El nombre debe tener al menos 3 caracteres';
     if (!datos.carnetIdentidad.trim()) return 'El carnet de identidad es obligatorio';
-    if (datos.carnetIdentidad.trim().length < 5) return 'El carnet debe tener al menos 5 caracteres';
+    if (datos.carnetIdentidad.trim().length < 11 || datos.carnetIdentidad.trim().length>11 ) return 'El carnet debe tener 11 caracteres';
     return null;
   };
 
@@ -135,8 +135,9 @@ export const FormularioReserva = ({ onSubmit, onCancel }: FormularioReservaProps
         <input
           type="text"
           value={datos.carnetIdentidad}
-          placeholder="Ej: 12345678"
+          placeholder="Ej: 09090987654"
           disabled={enviando}
+          maxLength={11}
           onChange={(e) => set('carnetIdentidad', e.target.value)}
           style={estiloInput}
           onFocus={(e) => (e.target.style.borderColor = '#b87c5a')}
@@ -163,11 +164,12 @@ export const FormularioReserva = ({ onSubmit, onCancel }: FormularioReservaProps
         <button
           onClick={onCancel}
           disabled={enviando}
-          className="flex-1 py-2.5 rounded-xl text-sm transition-all disabled:opacity-50"
+          className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-50"
           style={{
-  background: 'linear-gradient(135deg, #2563eb, #1e40af)',
-  boxShadow: '0 2px 8px rgba(37, 99, 235, 0.3)',
-}}
+            backgroundColor: '#f8fafc',
+            color: '#64748b',
+            border: '1px solid rgba(226,232,240,0.9)',
+          }}
         >
           Cancelar
         </button>
@@ -176,8 +178,8 @@ export const FormularioReserva = ({ onSubmit, onCancel }: FormularioReservaProps
           disabled={enviando}
           className="flex-1 py-2.5 rounded-xl text-sm font-medium text-white transition-all disabled:opacity-60"
           style={{
-            background: 'linear-gradient(135deg, #8b5c3e, #a0725a)',
-            boxShadow: '0 2px 8px rgba(139,92,62,0.3)',
+            background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+            boxShadow: '0 2px 12px rgba(37,99,235,0.3)',
           }}
         >
           {enviando ? 'Reservando...' : 'Confirmar reserva'}
