@@ -26,7 +26,6 @@ const TURNO_VACIO: FormularioTurnoType = {
   horaInicio: '',
   horaFin: '',
   capacidadMaxima: 5,
-  estado: 'activo',
 };
 
 // Estilo compartido para los campos del formulario
@@ -161,7 +160,7 @@ export const FormularioTurno = ({
         <input
           type="number"
           min={1}
-          max={100}
+          max={5}
           value={datos.capacidadMaxima}
           disabled={ocupado}
           onChange={(e) => set('capacidadMaxima', parseInt(e.target.value) || 1)}
@@ -170,24 +169,6 @@ export const FormularioTurno = ({
           onBlur={(e) => (e.target.style.borderColor = 'rgba(226,232,240,0.8)')}
         />
       </div>
-
-      {/* Estado — solo visible al editar */}
-      {modoEdicion && (
-        <div>
-          <label style={estiloLabel}>Estado</label>
-          <select
-            value={datos.estado}
-            disabled={ocupado}
-            onChange={(e) => set('estado', e.target.value as 'activo' | 'inactivo')}
-            style={estiloInput}
-            onFocus={(e) => (e.target.style.borderColor = '#2563eb')}
-            onBlur={(e) => (e.target.style.borderColor = 'rgba(226,232,240,0.8)')}
-          >
-            <option value="activo">Activo</option>
-            <option value="inactivo">Inactivo</option>
-          </select>
-        </div>
-      )}
 
       {/* Error */}
       {error && (

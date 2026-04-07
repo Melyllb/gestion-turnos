@@ -15,6 +15,7 @@ import type { FormularioReserva as FormularioReservaType } from '../types';
 interface FormularioReservaProps {
   onSubmit: (datos: FormularioReservaType) => Promise<void>;
   onCancel: () => void;
+  exito?: boolean;
 }
 
 const estiloInput: React.CSSProperties = {
@@ -42,7 +43,7 @@ const estiloLabel: React.CSSProperties = {
 
 
 
-export const FormularioReserva = ({ onSubmit, onCancel }: FormularioReservaProps) => {
+export const FormularioReserva = ({ onSubmit, onCancel, exito = false }: FormularioReservaProps) => {
   const [datos, setDatos] = useState<FormularioReservaType>({
     nombreCliente: '',
     carnetIdentidad: '',
@@ -50,7 +51,6 @@ export const FormularioReserva = ({ onSubmit, onCancel }: FormularioReservaProps
 
   const [error, setError] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
-  const [exito, setExito] = useState(false);
 
   const set = (campo: keyof FormularioReservaType, valor: string) => {
     setDatos((prev) => ({ ...prev, [campo]: valor }));
@@ -78,9 +78,6 @@ export const FormularioReserva = ({ onSubmit, onCancel }: FormularioReservaProps
         nombreCliente: datos.nombreCliente.trim(),
         carnetIdentidad: datos.carnetIdentidad.trim(),
       });
-      setExito(true);
-      // El padre cierra el modal tras leer el éxito
-      setTimeout(onCancel, 1500);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Error al realizar la reserva');
     } finally {
@@ -91,21 +88,21 @@ export const FormularioReserva = ({ onSubmit, onCancel }: FormularioReservaProps
   // ── Vista de éxito ──
   if (exito) {
     return (
-      <div className="text-center py-6">
+      <div className="text-center py-8">
         <div
-          className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl"
-          style={{ backgroundColor: '#f0fdf4' }}
+          className="mx-auto mb-5 grid place-items-center rounded-full"
+          style={{ width: '4.5rem', height: '4.5rem', backgroundColor: '#ecfdf5' }}
         >
-          ✓
+          <span className="text-4xl" style={{ color: '#15803d' }}>✓</span>
         </div>
         <p
-          className="font-semibold text-lg"
-          style={{ color: '#15803d', fontFamily: "'Georgia', serif" }}
+          className="font-semibold text-2xl mb-2"
+          style={{ color: '#0f172a', letterSpacing: '-0.03em' }}
         >
           ¡Reserva confirmada!
         </p>
-        <p className="text-sm mt-1" style={{ color: '#9a7060' }}>
-          Tu lugar está reservado. ¡Te esperamos!
+        <p className="text-sm mb-6" style={{ color: '#475569', lineHeight: '1.7' }}>
+          Tu lugar está reservado correctamente. Nuestro equipo te espera en la cita seleccionada.
         </p>
       </div>
     );

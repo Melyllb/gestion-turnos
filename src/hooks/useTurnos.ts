@@ -114,12 +114,16 @@ export const useTurnos = () => {
     const turnoActual = turnos.find((t) => t.id === id);
     if (!turnoActual) throw new Error('Turno no encontrado');
 
+    // Validar que la capacidad no sea menor a las reservas confirmadas
+    if (datos.capacidadMaxima !== undefined && datos.capacidadMaxima < turnoActual.reservasConfirmadas) {
+      throw new Error(`La capacidad no puede ser menor a las ${turnoActual.reservasConfirmadas} reservas confirmadas`);
+    }
+
     const datosMerge: FormularioTurno = {
       fecha: datos.fecha ?? turnoActual.fecha,
       horaInicio: datos.horaInicio ?? turnoActual.horaInicio,
       horaFin: datos.horaFin ?? turnoActual.horaFin,
       capacidadMaxima: datos.capacidadMaxima ?? turnoActual.capacidadMaxima,
-      estado: datos.estado ?? turnoActual.estado,
     };
 
     const errorValidacion = validarFormulario(datosMerge, id);

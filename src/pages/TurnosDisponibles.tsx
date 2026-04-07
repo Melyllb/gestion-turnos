@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useTurnos } from '../hooks/useTurnos';
 import { useReservas } from '../hooks/useReservas';
 import { Modal } from '../components/Modal';
@@ -309,11 +309,13 @@ const TarjetaTurno = ({ turno, seleccionado = false, onReservar }: TarjetaTurnoP
 // ── Página principal ──────────────────────────────────────────
 
 export const TurnosDisponibles = () => {
-  const { turnos, cargando, error } = useTurnos();
+  const { turnos, cargando, error, recargar } = useTurnos();
   const { crearReserva } = useReservas();
 
   const [fechaSeleccionada, setFechaSeleccionada] = useState<string>(hoy());
   const [turnoParaReservar, setTurnoParaReservar] = useState<TurnoConDisponibilidad | null>(null);
+  const [reservaConfirmada, setReservaConfirmada] = useState(false);
+  const cierreModalTimeout = useRef<number | null>(null);
   // Dentro del componente TurnosDisponibles, agrega este estado
 const [filtroHorario, setFiltroHorario] = useState<'todas' | 'manana' | 'tarde'>('todas');
 
@@ -351,12 +353,37 @@ const turnosFiltrados = useMemo(() => {
   // };
 
   const handleAbrirModal = (turno: TurnoConDisponibilidad) => {
+    if (cierreModalTimeout.current) {
+      window.clearTimeout(cierreModalTimeout.current);
+      cierreModalTimeout.current = null;
+    }
+    setReservaConfirmada(false);
     setTurnoParaReservar(turno);
+  };
+
+  const cerrarModal = () => {
+    if (cierreModalTimeout.current) {
+      window.clearTimeout(cierreModalTimeout.current);
+      cierreModalTimeout.current = null;
+    }
+    setReservaConfirmada(false);
+    setTurnoParaReservar(null);
   };
 
   const handleConfirmarReserva = async (datos: FormularioReservaType) => {
     if (!turnoParaReservar?.id) return;
-    await crearReserva(turnoParaReservar.id, datos);
+    try {
+      await crearReserva(turnoParaReservar.id, datos);
+      await recargar();
+      setReservaConfirmada(true);
+      cierreModalTimeout.current = window.setTimeout(() => {
+        setReservaConfirmada(false);
+        setTurnoParaReservar(null);
+        cierreModalTimeout.current = null;
+      }, 2600);
+    } catch (error) {
+      console.error('Error al crear reserva:', error);
+    }
   };
 
   if (cargando) {
@@ -522,11 +549,12 @@ const turnosFiltrados = useMemo(() => {
         <Modal
           titulo="Completar reserva"
           subtitulo={`${turnoParaReservar.horaInicio} – ${turnoParaReservar.horaFin} · ${toLocalDate(turnoParaReservar.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}`}
-          onClose={() => setTurnoParaReservar(null)}
+          onClose={cerrarModal}
         >
           <FormularioReserva
             onSubmit={handleConfirmarReserva}
-            onCancel={() => setTurnoParaReservar(null)}
+            onCancel={cerrarModal}
+            exito={reservaConfirmada}
           />
         </Modal>
       )}

@@ -2,8 +2,14 @@ import { useState } from 'react';
 import { useTurnos } from '../../hooks/useTurnos';
 import { Modal } from '../../components/Modal';
 import { FormularioTurno } from '../../components/FormularioTurno';
-import { BadgeEstado } from '../../components/BadgeEstado';
 import type { TurnoConDisponibilidad, FormularioTurno as FormularioTurnoType } from '../../types';
+
+// ── Helpers de fecha ─────────────────────────────────────────
+
+const toLocalDate = (fechaStr: string) => {
+  const [y, m, d] = fechaStr.split('-').map(Number);
+  return new Date(y, m - 1, d);
+};
 
 // ── Diálogo de confirmación de eliminación ──
 interface DialogoConfirmacionProps {
@@ -54,7 +60,7 @@ const DialogoConfirmacion = ({
 );
 
 export const AdminTurnos = () => {
-  const { turnos, cargando, error, crearTurno, editarTurno, eliminarTurno, recargar } = useTurnos();
+  const { turnos, cargando, error, crearTurno, editarTurno, cambiarEstado, recargar } = useTurnos();
 
   const [modalAbierto, setModalAbierto] = useState(false);
   const [turnoEditando, setTurnoEditando] = useState<TurnoConDisponibilidad | null>(null);
@@ -100,16 +106,16 @@ export const AdminTurnos = () => {
     }
   };
 
-  // Eliminar turno
-  const confirmarEliminar = async () => {
+  // Inactivar turno
+  const confirmarInactivar = async () => {
     if (!eliminandoId) return;
     try {
       setCargandoAccion(true);
-      await eliminarTurno(eliminandoId);
+      await cambiarEstado(eliminandoId, 'inactivo');
       await recargar();
       setEliminandoId(null);
     } catch (e) {
-      setErrorModal(e instanceof Error ? e.message : 'Error al eliminar el turno');
+      setErrorModal(e instanceof Error ? e.message : 'Error al inactivar el turno');
       setEliminandoId(null);
     } finally {
       setCargandoAccion(false);
@@ -215,9 +221,6 @@ export const AdminTurnos = () => {
                     <th className="px-6 py-3 text-left text-xs font-semibold" style={{ color: '#64748b' }}>
                       Disponibilidad
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold" style={{ color: '#64748b' }}>
-                      Estado
-                    </th>
                     <th className="px-6 py-3 text-right text-xs font-semibold" style={{ color: '#64748b' }}>
                       Acciones
                     </th>
@@ -232,7 +235,7 @@ export const AdminTurnos = () => {
                       }}
                     >
                       <td className="px-6 py-3 text-sm" style={{ color: '#0f172a' }}>
-                        {new Date(turno.fecha).toLocaleDateString('es-ES', {
+                        {toLocalDate(turno.fecha).toLocaleDateString('es-ES', {
                           weekday: 'short',
                           day: 'numeric',
                           month: 'short',
@@ -258,9 +261,6 @@ export const AdminTurnos = () => {
                           {turno.cuposDisponibles}/{turno.capacidadMaxima}
                         </span>
                       </td>
-                      <td className="px-6 py-3 text-sm">
-                        <BadgeEstado estado={turno.estado} />
-                      </td>
                       <td className="px-6 py-3 text-sm text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
@@ -275,7 +275,7 @@ export const AdminTurnos = () => {
                             className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:bg-red-50"
                             style={{ color: '#dc2626' }}
                           >
-                            Eliminar
+                            Inactivar
                           </button>
                         </div>
                       </td>
@@ -308,7 +308,6 @@ export const AdminTurnos = () => {
                     horaInicio: turnoEditando.horaInicio,
                     horaFin: turnoEditando.horaFin,
                     capacidadMaxima: turnoEditando.capacidadMaxima,
-                    estado: turnoEditando.estado,
                   }
                 : undefined
             }
@@ -331,17 +330,17 @@ export const AdminTurnos = () => {
         </Modal>
       )}
 
-      {/* Modal de confirmación de eliminación */}
+      {/* Modal de confirmación de inactivación */}
       {eliminandoId !== null && (
         <Modal
-          titulo="Eliminar turno"
+          titulo="Inactivar turno"
           onClose={() => setEliminandoId(null)}
           ancho="sm"
         >
           <DialogoConfirmacion
-            titulo="¿Eliminar este turno?"
-            mensaje="Esta acción no se puede deshacer. Asegúrate de que no haya reservas confirmadas para este turno."
-            onConfirmar={confirmarEliminar}
+            titulo="¿Inactivar este turno?"
+            mensaje="El turno ya no estará disponible para nuevas reservas. Los cupos restantes se bloquearán."
+            onConfirmar={confirmarInactivar}
             onCancelar={() => setEliminandoId(null)}
             peligroso
             cargando={cargandoAccion}

@@ -59,7 +59,6 @@ export interface FormularioTurno {
   horaInicio: string;
   horaFin: string;
   capacidadMaxima: number;
-  estado: 'activo' | 'inactivo';
 }
 
 // Tipo para el contexto de autenticación

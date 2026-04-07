@@ -46,7 +46,7 @@ export const useStorage = () => {
 
       const nuevoTurno: Turno = {
         ...turno,
-        estado: turno.estado || 'activo'
+        estado: 'activo'
       };
       
       const id = await db.turnos.add(nuevoTurno);
@@ -86,19 +86,10 @@ export const useStorage = () => {
 
   const deleteTurno = async (id: number) => {
     try {
-      const reservas = await db.reservas
-        .where('turnoId')
-        .equals(id)
-        .count();
-      
-      if (reservas > 0) {
-        throw new Error('No se puede eliminar un turno que tiene reservas asociadas');
-      }
-      
-      await db.turnos.delete(id);
+      await db.turnos.update(id, { estado: 'inactivo' });
       return true;
     } catch (error) {
-      console.error('Error al eliminar turno:', error);
+      console.error('Error al inactivar turno:', error);
       throw error;
     }
   };
