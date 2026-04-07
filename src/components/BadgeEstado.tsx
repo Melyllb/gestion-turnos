@@ -1,13 +1,3 @@
-// ============================================================
-// BADGE ESTADO
-// Componente reutilizable para mostrar el estado de un turno
-// o una reserva con colores semánticos coherentes en toda la app.
-//
-// Variantes soportadas:
-//   Turnos:   'activo' | 'inactivo'
-//   Reservas: 'confirmada' | 'cancelada'
-// ============================================================
-
 type EstadoTurno = 'activo' | 'inactivo';
 type EstadoReserva = 'confirmada' | 'cancelada' | 'completada';
 

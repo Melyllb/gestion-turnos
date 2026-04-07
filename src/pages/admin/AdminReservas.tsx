@@ -3,6 +3,12 @@ import { useReservas } from '../../hooks/useReservas';
 import { Modal } from '../../components/Modal';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { BadgeEstado } from '../../components/BadgeEstado';
+import todas from '../../assets/news_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg';
+import confirmadas from '../../assets/task_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg';
+import completadas from '../../assets/person_check_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg';
+import canceladas from '../../assets/person_cancel_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg';
+import equal from '../../assets/equal_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg';
+
 import type { ReservaConTurno } from '../../types';
 
 type EstadoReservaAdmin = 'confirmada' | 'cancelada' | 'completada';
@@ -11,16 +17,6 @@ type ReservaAdmin = ReservaConTurno & {
   estadoVisual: EstadoReservaAdmin;
 };
 
-// ============================================================
-// ADMIN RESERVAS
-// Panel de administración para gestionar reservas.
-// Funcionalidades:
-//   - Listar todas las reservas con información del turno
-//   - Ver detalles del cliente en modal
-//   - Cancelar reservas
-//   - Filtrar por estado (confirmadas/canceladas)
-//   - Buscar por cliente o carnet
-// ============================================================
 
 // ── Modal de detalles del cliente ──
 interface ModalDetalleClienteProps {
@@ -312,7 +308,9 @@ export const AdminReservas = () => {
                 <p className="text-xs uppercase tracking-wider" style={{ color: '#64748b' }}>Total</p>
                 <p className="text-2xl font-bold mt-1" style={{ color: '#0f172a' }}>{estadisticasAdmin.total}</p>
               </div>
-              <span className="text-2xl">📋</span>
+              <span className="text-5xl">
+                <img src={todas} alt="todas" style={{ width: '30px', height: '30px' }} />
+              </span>
             </div>
           </div>
           <div
@@ -324,7 +322,9 @@ export const AdminReservas = () => {
                 <p className="text-xs uppercase tracking-wider" style={{ color: '#64748b' }}>Confirmadas</p>
                 <p className="text-2xl font-bold mt-1" style={{ color: '#15803d' }}>{estadisticasAdmin.confirmadas}</p>
               </div>
-              <span className="text-2xl">✅</span>
+              <span className="text-2xl">
+                <img src={confirmadas} alt="confirmadas" style={{ width: '30px', height: '30px' }} />
+              </span>
             </div>
           </div>
           <div
@@ -336,7 +336,9 @@ export const AdminReservas = () => {
                 <p className="text-xs uppercase tracking-wider" style={{ color: '#64748b' }}>Completadas</p>
                 <p className="text-2xl font-bold mt-1" style={{ color: '#0f172a' }}>{estadisticasAdmin.completadas}</p>
               </div>
-              <span className="text-2xl">🏁</span>
+              <span className="text-2xl">
+                <img src={completadas} alt="completadas" style={{ width: '30px', height: '30px' }} />
+              </span>
             </div>
           </div>
           <div
@@ -348,7 +350,9 @@ export const AdminReservas = () => {
                 <p className="text-xs uppercase tracking-wider" style={{ color: '#64748b' }}>Canceladas</p>
                 <p className="text-2xl font-bold mt-1" style={{ color: '#dc2626' }}>{estadisticasAdmin.canceladas}</p>
               </div>
-              <span className="text-2xl">❌</span>
+              <span className="text-2xl">
+                <img src={canceladas} alt="canceladas" style={{ width: '30px', height: '30px' }} />
+              </span>
             </div>
           </div>
         </div>
@@ -398,14 +402,6 @@ export const AdminReservas = () => {
               }}
             />
           </div>
-          
-          <button
-            onClick={recargar}
-            className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
-            style={{ backgroundColor: '#f1f5f9', color: '#64748b' }}
-          >
-            🔄 Actualizar
-          </button>
         </div>
 
         {/* Tabla de reservas */}
@@ -422,7 +418,9 @@ export const AdminReservas = () => {
               className="flex flex-col items-center justify-center py-12"
               style={{ backgroundColor: '#f8fafc' }}
             >
-              <span className="text-3xl mb-3">📭</span>
+              <span className="text-3xl mb-3">
+                <img src={equal} alt="equal" />
+              </span>
               <p className="font-medium" style={{ color: '#475569' }}>
                 No hay reservas que coincidan con los filtros
               </p>

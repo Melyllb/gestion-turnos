@@ -1,17 +1,5 @@
 import { useState } from 'react';
 import type { FormularioReserva as FormularioReservaType } from '../types';
-
-// ============================================================
-// FORMULARIO RESERVA
-// Formulario reutilizable para que el cliente complete
-// sus datos al reservar un turno. Se usa dentro de Modal
-// en TurnosDisponibles.
-//
-// Props:
-//   onSubmit  → función async que recibe nombre y carnet
-//   onCancel  → función para cerrar sin reservar
-// ============================================================
-
 interface FormularioReservaProps {
   onSubmit: (datos: FormularioReservaType) => Promise<void>;
   onCancel: () => void;

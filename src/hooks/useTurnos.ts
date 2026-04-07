@@ -9,12 +9,6 @@ export const useTurnos = () => {
   const [error, setError] = useState<string | null>(null);
 
   const storage = useStorage();
-
-  // ============================================================
-  // CARGA DE TURNOS
-  // useCallback evita que cargarTurnos se recree en cada render,
-  // lo que causaría un loop infinito al usarla dentro del useEffect.
-  // ============================================================
   const cargarTurnos = useCallback(async () => {
     try {
       setCargando(true);
@@ -28,22 +22,10 @@ export const useTurnos = () => {
     }
   }, []);
 
-  // Carga inicial al montar el hook
   useEffect(() => {
     cargarTurnos();
   }, [cargarTurnos]);
 
-  // ============================================================
-  // VALIDACIÓN DE SOLAPAMIENTO HORARIO
-  // Dos turnos se solapan si comparten la misma fecha y sus
-  // rangos horarios se intersectan. La intersección ocurre cuando:
-  //   nuevo.horaInicio < existente.horaFin
-  //   Y
-  //   nuevo.horaFin > existente.horaInicio
-  //
-  // El parámetro idExcluir se usa al editar: evita que un turno
-  // colisione consigo mismo al compararse.
-  // ============================================================
   const haySolapamiento = (datos: FormularioTurno, idExcluir?: number): boolean => {
     return turnos.some((turno) => {
       // Si es el mismo turno que estamos editando, lo saltamos
@@ -64,13 +46,6 @@ export const useTurnos = () => {
       return nuevoEmpieza < existenteTermina && nuevoTermina > existenteEmpieza;
     });
   };
-
-  // ============================================================
-  // VALIDACIONES GENERALES DEL FORMULARIO
-  // Centraliza todas las validaciones de negocio antes de
-  // tocar la base de datos. Retorna un string con el error
-  // o null si todo está bien.
-  // ============================================================
   const validarFormulario = (datos: FormularioTurno, idExcluir?: number): string | null => {
     if (!datos.fecha) return 'La fecha es obligatoria';
     if (!datos.horaInicio) return 'La hora de inicio es obligatoria';
@@ -88,12 +63,6 @@ export const useTurnos = () => {
     return null;
   };
 
-  // ============================================================
-  // CREAR TURNO
-  // Valida primero, luego persiste y recarga el estado.
-  // Lanza un Error con mensaje legible para que el componente
-  // que llama pueda mostrarlo al usuario.
-  // ============================================================
   const crearTurno = async (datos: FormularioTurno): Promise<number> => {
     const errorValidacion = validarFormulario(datos);
     if (errorValidacion) throw new Error(errorValidacion);
@@ -103,11 +72,6 @@ export const useTurnos = () => {
     return id;
   };
 
-  // ============================================================
-  // EDITAR TURNO
-  // Pasa el id actual como idExcluir para que el turno no
-  // colisione consigo mismo durante la validación de solapamiento.
-  // ============================================================
   const editarTurno = async (id: number, datos: Partial<FormularioTurno>): Promise<void> => {
     // Para validar solapamiento necesitamos los datos completos.
     // Mezclamos los datos actuales del turno con los nuevos.
@@ -133,32 +97,16 @@ export const useTurnos = () => {
     await cargarTurnos();
   };
 
-  // ============================================================
-  // ELIMINAR TURNO
-  // useStorage ya valida que no haya reservas asociadas.
-  // Aquí solo propagamos el error si lo hay.
-  // ============================================================
   const eliminarTurno = async (id: number): Promise<void> => {
     await storage.deleteTurno(id);
     await cargarTurnos();
   };
 
-  // ============================================================
-  // CAMBIAR ESTADO (activar / desactivar)
-  // Permite desactivar un turno sin eliminarlo, conservando
-  // el historial de reservas asociadas.
-  // ============================================================
   const cambiarEstado = async (id: number, estado: 'activo' | 'inactivo'): Promise<void> => {
     await storage.toggleTurnoEstado(id, estado);
     await cargarTurnos();
   };
 
-  // ============================================================
-  // DISPONIBILIDAD CALCULADA
-  // Los turnos ya vienen con cuposDisponibles desde
-  // getTurnosConDisponibilidad(), pero exponemos también una
-  // función puntual para consultar un turno específico.
-  // ============================================================
   const getDisponibilidad = (turnoId: number): number => {
     const turno = turnos.find((t) => t.id === turnoId);
     return turno ? turno.cuposDisponibles : 0;

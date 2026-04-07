@@ -1,17 +1,3 @@
-// ============================================================
-// CONFIRM DIALOG
-// Componente reutilizable de confirmación destructiva.
-// Se usa para acciones irreversibles como eliminar un turno
-// o cancelar una reserva, antes de ejecutar la acción real.
-//
-// Props:
-//   mensaje    → descripción de la acción a confirmar
-//   labelAceptar → texto del botón de confirmar (default: 'Confirmar')
-//   variante   → 'peligro' (rojo) | 'advertencia' (naranja)
-//   onAceptar  → función async ejecutada al confirmar
-//   onCancelar → función para cerrar sin hacer nada
-// ============================================================
-
 interface ConfirmDialogProps {
   mensaje: string;
   labelAceptar?: string;

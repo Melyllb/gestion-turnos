@@ -4,18 +4,9 @@ import { useReservas } from '../hooks/useReservas';
 import { Modal } from '../components/Modal';
 import { FormularioReserva } from '../components/FormularioReserva';
 import { Calendario } from '../components/Calendario';
-import alarmIcon from '../assets/alarm.png';
+import alarmIcon from '../assets/alarm_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg';
 import { TarjetaTurno } from '../components/TarjetaTurno';
 import type { TurnoConDisponibilidad, FormularioReserva as FormularioReservaType } from '../types';
-
-// ============================================================
-// TURNOS DISPONIBLES
-// Página pública principal. Layout de dos columnas:
-//   Izquierda → calendario para seleccionar fecha
-//   Derecha   → grid de turnos del día seleccionado
-// ============================================================
-
-// ── Helpers de fecha ─────────────────────────────────────────
 
 const hoy = () => {
   const d = new Date();
@@ -68,9 +59,7 @@ const turnosFiltrados = useMemo(() => {
     return true;
   });
 }, [turnosDelDia, filtroHorario]);
-  // const handleSeleccionarTurno = (turno: TurnoConDisponibilidad) => {
-  //   setTurnoSeleccionado((prev) => (prev?.id === turno.id ? null : turno));
-  // };
+
 
   const handleAbrirModal = (turno: TurnoConDisponibilidad) => {
     if (cierreModalTimeout.current) {
@@ -238,7 +227,7 @@ const turnosFiltrados = useMemo(() => {
     }}
   >
     <span className="text-4xl mb-3">
-      <img src={alarmIcon} alt="Alarm" />
+      <img src={alarmIcon} alt="Alarm" style={{ width: '30px', height: '30px' }} />
     </span>
     <p className="font-medium text-sm mb-1" style={{ color: '#475569' }}>
       No hay turnos en este horario

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import calendarIcon from '../assets/calendar_month_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.png';
+import calendarIcon from '../assets/calendar_month_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg';
 import type { FC } from 'react';
 
 type CalendarioProps = {

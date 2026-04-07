@@ -12,12 +12,6 @@ export const useReservas = () => {
 
   const storage = useStorage();
 
-  // ============================================================
-  // CARGA DE RESERVAS CON DATOS DEL TURNO
-  // getReservasConTurno() hace un join manual en IndexedDB:
-  // por cada reserva busca su turno asociado y lo incrusta.
-  // useCallback evita el loop infinito en el useEffect.
-  // ============================================================
   const cargarReservas = useCallback(async () => {
     try {
       setCargando(true);
@@ -43,19 +37,6 @@ export const useReservas = () => {
     cargarReservas();
   }, [cargarReservas]);
 
-  // ============================================================
-  // CREAR RESERVA
-  // La verificación de cupo ya está implementada en useStorage,
-  // pero aquí añadimos una verificación previa optimista usando
-  // el estado local de reservas, para dar feedback más rápido
-  // sin necesidad de ir a IndexedDB primero.
-  //
-  // Flujo:
-  //   1. Verificación optimista con estado local
-  //   2. Llamada a storage.addReserva() que hace la verificación
-  //      definitiva contra IndexedDB (fuente de verdad)
-  //   3. Recarga del estado
-  // ============================================================
   const crearReserva = async (
     turnoId: number,
     datos: FormularioReserva
@@ -88,9 +69,6 @@ export const useReservas = () => {
       }
     }
 
-    // Llamada definitiva a la capa de datos
-    // storage.addReserva verifica: turno activo, cupo disponible,
-    // duplicado por carnet — es la fuente de verdad final.
     const id = await storage.addReserva({
       ...datos,
       nombreCliente: datos.nombreCliente.trim(),
@@ -101,13 +79,6 @@ export const useReservas = () => {
     await cargarReservas();
     return id;
   };
-
-  // ============================================================
-  // CANCELAR RESERVA
-  // Cambia el estado de 'confirmada' a 'cancelada'.
-  // No elimina el registro, conserva el historial.
-  // useStorage valida que la reserva exista y no esté ya cancelada.
-  // ============================================================
   const cancelarReserva = async (id: number): Promise<void> => {
     const reserva = reservas.find((r) => r.id === id);
 
@@ -122,29 +93,14 @@ export const useReservas = () => {
     await cargarReservas();
   };
 
-  // ============================================================
-  // OBTENER RESERVAS POR TURNO
-  // Filtra del estado local sin ir a IndexedDB.
-  // Útil para mostrar las reservas de un turno específico
-  // en el panel de administración o en el modal de detalle.
-  // ============================================================
   const getReservasPorTurno = (turnoId: number): ReservaConTurno[] => {
     return reservas.filter((r) => r.turnoId === turnoId);
   };
 
-  // ============================================================
-  // OBTENER RESERVAS POR CLIENTE
-  // Filtra por carnet de identidad, útil para verificar
-  // si un cliente ya tiene reservas activas.
-  // ============================================================
   const getReservasPorCliente = (carnetIdentidad: string): ReservaConTurno[] => {
     return reservas.filter((r) => r.carnetIdentidad === carnetIdentidad.trim());
   };
 
-  // ============================================================
-  // ESTADÍSTICAS DERIVADAS DEL ESTADO LOCAL
-  // Se calculan sin ir a IndexedDB, directamente del estado.
-  // ============================================================
   const estadisticas = {
     total: reservas.length,
     confirmadas: reservas.filter((r) => r.estado === 'confirmada').length,

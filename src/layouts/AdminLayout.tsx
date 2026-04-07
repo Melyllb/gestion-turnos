@@ -1,16 +1,6 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
-// ============================================================
-// ADMIN LAYOUT
-// Envoltorio para todas las rutas protegidas del panel admin.
-// Provee:
-//   - Header con logo y datos del usuario logueado
-//   - Navegación entre /admin/turnos y /admin/reservas
-//   - Botón de cierre de sesión
-//   - Outlet donde se inyecta la página activa
-// ============================================================
-
 export const AdminLayout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();

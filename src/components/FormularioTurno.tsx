@@ -1,18 +1,5 @@
 import { useState } from 'react';
 import type { FormularioTurno as FormularioTurnoType } from '../types';
-
-// ============================================================
-// FORMULARIO TURNO
-// Componente reutilizable de formulario para crear y editar turnos.
-// Se usa dentro de Modal en CRUDTurnos.
-//
-// Props:
-//   valorInicial → datos del turno a editar (undefined = crear nuevo)
-//   onSubmit     → función async que recibe los datos validados
-//   onCancel     → función para cerrar sin guardar
-//   cargando     → deshabilita el formulario mientras se procesa
-// ============================================================
-
 interface FormularioTurnoProps {
   valorInicial?: Partial<FormularioTurnoType>;
   onSubmit: (datos: FormularioTurnoType) => Promise<void>;

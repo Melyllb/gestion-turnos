@@ -90,5 +90,4 @@ export class BeautyBrowsDB extends Dexie {
 }
 }
 
-// Exportar una instancia única de la base de datos
 export const db = new BeautyBrowsDB();
