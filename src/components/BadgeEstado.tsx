@@ -9,7 +9,7 @@
 // ============================================================
 
 type EstadoTurno = 'activo' | 'inactivo';
-type EstadoReserva = 'confirmada' | 'cancelada';
+type EstadoReserva = 'confirmada' | 'cancelada' | 'completada';
 
 interface BadgeEstadoProps {
   estado: EstadoTurno | EstadoReserva;
@@ -20,6 +20,7 @@ const estilos: Record<string, React.CSSProperties> = {
   inactivo:    { backgroundColor: '#f3ede9', color: '#b0948a' },
   confirmada:  { backgroundColor: '#f0fdf4', color: '#15803d' },
   cancelada:   { backgroundColor: '#fff5f5', color: '#c0392b' },
+  completada:  { backgroundColor: '#fef9c3', color: '#b45309' },
 };
 
 const etiquetas: Record<string, string> = {
@@ -27,6 +28,7 @@ const etiquetas: Record<string, string> = {
   inactivo:   'Inactivo',
   confirmada: 'Confirmada',
   cancelada:  'Cancelada',
+  completada: 'Completada',
 };
 
 export const BadgeEstado = ({ estado }: BadgeEstadoProps) => (

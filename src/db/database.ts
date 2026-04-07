@@ -81,6 +81,7 @@ export class BeautyBrowsDB extends Dexie {
   const count = await this.usuarios.count();
   if (count === 0) {
     await this.usuarios.add({
+      nombre: 'admin',
       email: 'admin@beautybrows.com',
       password: 'admin123'
     });

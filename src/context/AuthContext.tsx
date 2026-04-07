@@ -90,6 +90,15 @@ import { db } from '../db/database';
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+const obtenerNombreDesdeEmail = (email: string): string => {
+  return email.trim().split('@')[0] || '';
+};
+
+const normalizarUsuario = (usuario: Usuario): Usuario => ({
+  ...usuario,
+  nombre: usuario.nombre?.trim() || obtenerNombreDesdeEmail(usuario.email),
+});
+
 // ── Recuperar sesión del localStorage ────────────────────────
 // Se ejecuta como inicializador lazy del useState, UNA sola vez
 // antes del primer render, sin necesidad de useEffect.
@@ -108,7 +117,7 @@ const recuperarSesion = (): Usuario | null => {
       return null;
     }
 
-    return usuario;
+    return normalizarUsuario(usuario);
   } catch {
     localStorage.removeItem('bb_user');
     return null;
@@ -135,7 +144,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         try {
           const usuario = JSON.parse(e.newValue) as Usuario;
-          if (usuario?.email) setUser(usuario);
+          if (usuario?.email) setUser(normalizarUsuario(usuario));
         } catch {
           setUser(null);
         }
@@ -159,9 +168,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (!usuario) return false;
       if (usuario.password !== password) return false;
 
+      const usuarioNormalizado = normalizarUsuario(usuario);
+
       // Sesión válida: guardar en estado y persistir
-      setUser(usuario);
-      localStorage.setItem('bb_user', JSON.stringify(usuario));
+      setUser(usuarioNormalizado);
+      localStorage.setItem('bb_user', JSON.stringify(usuarioNormalizado));
       return true;
     } catch {
       return false;

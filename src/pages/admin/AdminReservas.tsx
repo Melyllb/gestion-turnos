@@ -5,6 +5,12 @@ import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { BadgeEstado } from '../../components/BadgeEstado';
 import type { ReservaConTurno } from '../../types';
 
+type EstadoReservaAdmin = 'confirmada' | 'cancelada' | 'completada';
+
+type ReservaAdmin = ReservaConTurno & {
+  estadoVisual: EstadoReservaAdmin;
+};
+
 // ============================================================
 // ADMIN RESERVAS
 // Panel de administración para gestionar reservas.
@@ -18,7 +24,7 @@ import type { ReservaConTurno } from '../../types';
 
 // ── Modal de detalles del cliente ──
 interface ModalDetalleClienteProps {
-  reserva: ReservaConTurno;
+  reserva: ReservaAdmin;
   onClose: () => void;
   onCancelar?: () => void;
 }
@@ -130,10 +136,10 @@ const ModalDetalleCliente = ({ reserva, onClose, onCancelar }: ModalDetalleClien
               <div>
                 <p className="text-xs" style={{ color: '#94a3b8' }}>Estado</p>
                 <div className="mt-1">
-                  <BadgeEstado estado={reserva.estado} />
+                  <BadgeEstado estado={reserva.estadoVisual} />
                 </div>
               </div>
-              {reserva.estado === 'confirmada' && onCancelar && (
+              {reserva.estadoVisual === 'confirmada' && onCancelar && (
                 <button
                   onClick={() => {
                     onClose();
@@ -155,23 +161,47 @@ const ModalDetalleCliente = ({ reserva, onClose, onCancelar }: ModalDetalleClien
 
 // ── Componente principal ──
 export const AdminReservas = () => {
-  const { reservas, cargando, error, cancelarReserva, recargar, estadisticas } = useReservas();
+  const { reservas, cargando, error, cancelarReserva, recargar } = useReservas();
   
-  const [reservaSeleccionada, setReservaSeleccionada] = useState<ReservaConTurno | null>(null);
-  const [reservaACancelar, setReservaACancelar] = useState<ReservaConTurno | null>(null);
+  const [reservaSeleccionada, setReservaSeleccionada] = useState<ReservaAdmin | null>(null);
+  const [reservaACancelar, setReservaACancelar] = useState<ReservaAdmin | null>(null);
   
   // Filtros
-  const [filtroEstado, setFiltroEstado] = useState<'todas' | 'confirmada' | 'cancelada'>('todas');
+  const [filtroEstado, setFiltroEstado] = useState<'todas' | EstadoReservaAdmin>('todas');
   const [busqueda, setBusqueda] = useState('');
   
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1);
   const reservasPorPagina = 10;
 
+  const calcularEstadoReserva = (reserva: ReservaConTurno): EstadoReservaAdmin => {
+    if (reserva.estado === 'cancelada') return 'cancelada';
+    if (!reserva.turno) return reserva.estado;
+
+    const fechaTurno = reserva.turno.fecha;
+    const horaInicio = reserva.turno.horaInicio;
+    const fechaHoraTurno = new Date(`${fechaTurno}T${horaInicio}`);
+    const ahora = new Date();
+
+    return fechaHoraTurno.getTime() < ahora.getTime() ? 'completada' : 'confirmada';
+  };
+
+  const reservasConEstado = reservas.map((reserva) => ({
+    ...reserva,
+    estadoVisual: calcularEstadoReserva(reserva),
+  })) as ReservaAdmin[];
+
+  const estadisticasAdmin = {
+    total: reservasConEstado.length,
+    confirmadas: reservasConEstado.filter((r) => r.estadoVisual === 'confirmada').length,
+    canceladas: reservasConEstado.filter((r) => r.estadoVisual === 'cancelada').length,
+    completadas: reservasConEstado.filter((r) => r.estadoVisual === 'completada').length,
+  };
+
   // Filtrar reservas
-  const reservasFiltradas = reservas.filter((reserva) => {
+  const reservasFiltradas = reservasConEstado.filter((reserva) => {
     // Filtro por estado
-    if (filtroEstado !== 'todas' && reserva.estado !== filtroEstado) return false;
+    if (filtroEstado !== 'todas' && reserva.estadoVisual !== filtroEstado) return false;
     
     // Filtro por búsqueda (nombre o carnet)
     if (busqueda) {
@@ -272,7 +302,7 @@ export const AdminReservas = () => {
         </div>
 
         {/* Tarjetas de estadísticas */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+<div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
           <div
             className="rounded-xl p-4"
             style={{ backgroundColor: '#fff', border: '1px solid #e2e8f0' }}
@@ -280,7 +310,7 @@ export const AdminReservas = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs uppercase tracking-wider" style={{ color: '#64748b' }}>Total</p>
-                <p className="text-2xl font-bold mt-1" style={{ color: '#0f172a' }}>{estadisticas.total}</p>
+                <p className="text-2xl font-bold mt-1" style={{ color: '#0f172a' }}>{estadisticasAdmin.total}</p>
               </div>
               <span className="text-2xl">📋</span>
             </div>
@@ -292,7 +322,7 @@ export const AdminReservas = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs uppercase tracking-wider" style={{ color: '#64748b' }}>Confirmadas</p>
-                <p className="text-2xl font-bold mt-1" style={{ color: '#15803d' }}>{estadisticas.confirmadas}</p>
+                <p className="text-2xl font-bold mt-1" style={{ color: '#15803d' }}>{estadisticasAdmin.confirmadas}</p>
               </div>
               <span className="text-2xl">✅</span>
             </div>
@@ -303,8 +333,20 @@ export const AdminReservas = () => {
           >
             <div className="flex items-center justify-between">
               <div>
+                <p className="text-xs uppercase tracking-wider" style={{ color: '#64748b' }}>Completadas</p>
+                <p className="text-2xl font-bold mt-1" style={{ color: '#0f172a' }}>{estadisticasAdmin.completadas}</p>
+              </div>
+              <span className="text-2xl">🏁</span>
+            </div>
+          </div>
+          <div
+            className="rounded-xl p-4"
+            style={{ backgroundColor: '#fff', border: '1px solid #e2e8f0' }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
                 <p className="text-xs uppercase tracking-wider" style={{ color: '#64748b' }}>Canceladas</p>
-                <p className="text-2xl font-bold mt-1" style={{ color: '#dc2626' }}>{estadisticas.canceladas}</p>
+                <p className="text-2xl font-bold mt-1" style={{ color: '#dc2626' }}>{estadisticasAdmin.canceladas}</p>
               </div>
               <span className="text-2xl">❌</span>
             </div>
@@ -314,7 +356,7 @@ export const AdminReservas = () => {
         {/* Filtros y búsqueda */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="flex gap-2">
-            {(['todas', 'confirmada', 'cancelada'] as const).map((estado) => (
+            {(['todas', 'confirmada', 'completada', 'cancelada'] as const).map((estado) => (
               <button
                 key={estado}
                 onClick={() => {
@@ -328,7 +370,13 @@ export const AdminReservas = () => {
                   border: filtroEstado === estado ? 'none' : '1px solid #e2e8f0',
                 }}
               >
-                {estado === 'todas' ? 'Todas' : estado === 'confirmada' ? 'Confirmadas' : 'Canceladas'}
+                {estado === 'todas'
+                  ? 'Todas'
+                  : estado === 'confirmada'
+                  ? 'Confirmadas'
+                  : estado === 'cancelada'
+                  ? 'Canceladas'
+                  : 'Completadas'}
               </button>
             ))}
           </div>
@@ -448,7 +496,7 @@ export const AdminReservas = () => {
                         {formatearFechaHora(reserva.fechaReserva)}
                       </td>
                       <td className="px-6 py-3 text-sm">
-                        <BadgeEstado estado={reserva.estado} />
+                        <BadgeEstado estado={reserva.estadoVisual} />
                       </td>
                       <td className="px-6 py-3 text-sm text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -462,7 +510,7 @@ export const AdminReservas = () => {
                           >
                             Ver detalles
                           </button>
-                          {reserva.estado === 'confirmada' && (
+                          {reserva.estadoVisual === 'confirmada' && (
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -535,7 +583,7 @@ export const AdminReservas = () => {
           reserva={reservaSeleccionada}
           onClose={() => setReservaSeleccionada(null)}
           onCancelar={() => {
-            if (reservaSeleccionada.estado === 'confirmada') {
+            if (reservaSeleccionada.estadoVisual === 'confirmada') {
               setReservaACancelar(reservaSeleccionada);
             }
           }}

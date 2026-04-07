@@ -30,6 +30,7 @@ export interface ReservaConTurno extends Reserva {
 // Tipos para Usuarios
 export interface Usuario {
   id?: number;
+  nombre: string;
   email: string;
   password: string;
 }

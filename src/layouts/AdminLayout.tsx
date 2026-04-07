@@ -136,7 +136,7 @@ export const AdminLayout = () => {
 
           <div className="hidden sm:flex flex-col items-end">
             <span className="text-xs" style={{ color: '#94a3b8', letterSpacing: '0.05em' }}>
-              {user?.email}
+              {user?.nombre || user?.email}
             </span>
           </div>
 

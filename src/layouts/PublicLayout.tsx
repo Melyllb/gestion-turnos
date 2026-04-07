@@ -90,7 +90,7 @@ export const PublicLayout = () => {
         <div className="flex items-center gap-3">
           {isAuthenticated && (
             <span className="text-xs font-medium text-slate-600 truncate" style={{ maxWidth: '11rem' }}>
-              { user?.email  }
+              { user?.nombre}
             </span>
           )}
 
