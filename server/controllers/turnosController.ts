@@ -5,7 +5,7 @@ export const getTurnos = async (_req: Request, res: Response): Promise<void> => 
   try {
     const db = await readDB();
     res.json(db.turnos);
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Error al obtener los turnos' });
   }
 };
@@ -19,7 +19,7 @@ export const getTurnoById = async (req: Request, res: Response): Promise<void> =
       return;
     }
     res.json(turno);
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Error al obtener el turno' });
   }
 };
@@ -29,7 +29,7 @@ export const getTurnosActivos = async (_req: Request, res: Response): Promise<vo
     const db = await readDB();
     const activos = db.turnos.filter((t) => t.estado === 'activo');
     res.json(activos);
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Error al obtener los turnos activos' });
   }
 };
@@ -70,7 +70,7 @@ export const createTurno = async (req: Request, res: Response): Promise<void> =>
     await writeDB(db);
 
     res.status(201).json(nuevoTurno);
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Error al crear el turno' });
   }
 };
@@ -128,7 +128,7 @@ export const updateTurno = async (req: Request, res: Response): Promise<void> =>
 
     await writeDB(db);
     res.json(db.turnos[turnoIndex]);
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Error al actualizar el turno' });
   }
 };
@@ -148,7 +148,7 @@ export const deleteTurno = async (req: Request, res: Response): Promise<void> =>
     await writeDB(db);
 
     res.json({ mensaje: 'Turno eliminado correctamente' });
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Error al eliminar el turno' });
   }
 };
@@ -169,7 +169,7 @@ export const toggleTurnoEstado = async (req: Request, res: Response): Promise<vo
     await writeDB(db);
 
     res.json(db.turnos[turnoIndex]);
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Error al cambiar el estado del turno' });
   }
 };
@@ -191,7 +191,7 @@ export const getTurnosConDisponibilidad = async (_req: Request, res: Response): 
     });
 
     res.json(turnosConInfo);
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Error al obtener los turnos' });
   }
 };

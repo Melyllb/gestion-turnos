@@ -59,7 +59,7 @@ export async function readDB(): Promise<Database> {
   try {
     const data = await fs.readFile(DB_PATH, 'utf-8');
     return JSON.parse(data);
-  } catch (error) {
+  } catch {
     const initialDB: Database = {
       turnos: [],
       reservas: [],

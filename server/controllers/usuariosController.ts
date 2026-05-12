@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
-import { readDB, writeDB, Usuario } from '../utils/fileStorage';
+import { readDB, writeDB, Usuario } from '../utils/fileStorage.js';
 
 export const getUsuarios = async (_req: Request, res: Response): Promise<void> => {
   try {
     const db = await readDB();
-    const usuariosSinPassword = db.usuarios.map(({ password, ...rest }) => rest);
+    const usuariosSinPassword = db.usuarios.map(({ password: _, ...rest }) => rest);
     res.json(usuariosSinPassword);
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Error al obtener los usuarios' });
   }
 };
@@ -14,14 +14,14 @@ export const getUsuarios = async (_req: Request, res: Response): Promise<void> =
 export const getUsuarioById = async (req: Request, res: Response): Promise<void> => {
   try {
     const db = await readDB();
-    const usuario = db.usuarios.find((u) => u.id === Number(req.params.id));
+    const usuario = db.usuarios.find((u: Usuario) => u.id === Number(req.params.id));
     if (!usuario) {
       res.status(404).json({ error: 'Usuario no encontrado' });
       return;
     }
-    const { password, ...usuarioSinPassword } = usuario;
+    const { password: _, ...usuarioSinPassword } = usuario;
     res.json(usuarioSinPassword);
-  } catch (error) {
+  } catch  {
     res.status(500).json({ error: 'Error al obtener el usuario' });
   }
 };
@@ -47,7 +47,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       mensaje: 'Login exitoso',
       usuario: usuarioSinPassword,
     });
-  } catch (error) {
+  } catch  {
     res.status(500).json({ error: 'Error en el login' });
   }
 };
@@ -79,7 +79,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       mensaje: 'Usuario registrado correctamente',
       usuario: usuarioSinPassword,
     });
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Error al registrar el usuario' });
   }
 };

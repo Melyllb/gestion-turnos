@@ -22,7 +22,7 @@ export const getReservas = async (_req: Request, res: Response): Promise<void> =
     });
 
     res.json(ordenadas);
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Error al obtener las reservas' });
   }
 };
@@ -43,7 +43,7 @@ export const getReservaById = async (req: Request, res: Response): Promise<void>
         ? { fecha: turno.fecha, horaInicio: turno.horaInicio, horaFin: turno.horaFin }
         : null,
     });
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Error al obtener la reserva' });
   }
 };
@@ -54,7 +54,7 @@ export const getReservasByTurno = async (req: Request, res: Response): Promise<v
     const turnoId = Number(req.params.turnoId);
     const reservas = db.reservas.filter((r) => r.turnoId === turnoId);
     res.json(reservas);
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Error al obtener las reservas' });
   }
 };
@@ -114,7 +114,7 @@ export const createReserva = async (req: Request, res: Response): Promise<void> 
         horaFin: turno.horaFin,
       },
     });
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Error al crear la reserva' });
   }
 };
@@ -139,7 +139,7 @@ export const cancelReserva = async (req: Request, res: Response): Promise<void> 
     await writeDB(db);
 
     res.json({ mensaje: 'Reserva cancelada correctamente' });
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Error al cancelar la reserva' });
   }
 };
@@ -159,7 +159,7 @@ export const deleteReserva = async (req: Request, res: Response): Promise<void> 
     await writeDB(db);
 
     res.json({ mensaje: 'Reserva eliminada correctamente' });
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Error al eliminar la reserva' });
   }
 };

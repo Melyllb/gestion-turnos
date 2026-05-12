@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import turnosRouter from './routes/turnos';
 import reservasRouter from './routes/reservas';
 import usuariosRouter from './routes/usuarios';
+import healthRouter from './routes/health';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use('/api/turnos', turnosRouter);
 app.use('/api/reservas', reservasRouter);
 app.use('/api/usuarios', usuariosRouter);
+app.use('/api/health', healthRouter);
 
 const distPath = path.resolve(__dirname, '../dist');
 app.use(express.static(distPath));
