@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useStorage } from './useStorage';
+import { api } from '../services/api';
 import type { TurnoConDisponibilidad, FormularioTurno } from '../types';
 
 export const useTurnos = () => {
@@ -8,12 +8,15 @@ export const useTurnos = () => {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const storage = useStorage();
   const cargarTurnos = useCallback(async () => {
     try {
       setCargando(true);
       setError(null);
-      const data = await storage.getTurnosConDisponibilidad();
+      const data = await api.get<TurnoConDisponibilidad[]>('/turnos/disponibilidad');
+      data.sort((a, b) => {
+        if (a.fecha !== b.fecha) return a.fecha.localeCompare(b.fecha);
+        return a.horaInicio.localeCompare(b.horaInicio);
+      });
       setTurnos(data);
     } catch {
       setError('Error al cargar los turnos');
@@ -28,24 +31,17 @@ export const useTurnos = () => {
 
   const haySolapamiento = (datos: FormularioTurno, idExcluir?: number): boolean => {
     return turnos.some((turno) => {
-      // Si es el mismo turno que estamos editando, lo saltamos
       if (turno.id === idExcluir) return false;
-
-      // Solo comparamos turnos de la misma fecha
       if (turno.fecha !== datos.fecha) return false;
-
-      // Solo comparamos contra turnos activos
       if (turno.estado !== 'activo') return false;
-
-      // Comprobación de intersección de rangos horarios
       const nuevoEmpieza = datos.horaInicio;
       const nuevoTermina = datos.horaFin;
       const existenteEmpieza = turno.horaInicio;
       const existenteTermina = turno.horaFin;
-
       return nuevoEmpieza < existenteTermina && nuevoTermina > existenteEmpieza;
     });
   };
+
   const validarFormulario = (datos: FormularioTurno, idExcluir?: number): string | null => {
     if (!datos.fecha) return 'La fecha es obligatoria';
     if (!datos.horaInicio) return 'La hora de inicio es obligatoria';
@@ -67,18 +63,15 @@ export const useTurnos = () => {
     const errorValidacion = validarFormulario(datos);
     if (errorValidacion) throw new Error(errorValidacion);
 
-    const id = await storage.addTurno(datos);
+    const turno = await api.post<{ id: number }>('/turnos', datos);
     await cargarTurnos();
-    return id;
+    return turno.id;
   };
 
   const editarTurno = async (id: number, datos: Partial<FormularioTurno>): Promise<void> => {
-    // Para validar solapamiento necesitamos los datos completos.
-    // Mezclamos los datos actuales del turno con los nuevos.
     const turnoActual = turnos.find((t) => t.id === id);
     if (!turnoActual) throw new Error('Turno no encontrado');
 
-    // Validar que la capacidad no sea menor a las reservas confirmadas
     if (datos.capacidadMaxima !== undefined && datos.capacidadMaxima < turnoActual.reservasConfirmadas) {
       throw new Error(`La capacidad no puede ser menor a las ${turnoActual.reservasConfirmadas} reservas confirmadas`);
     }
@@ -93,17 +86,21 @@ export const useTurnos = () => {
     const errorValidacion = validarFormulario(datosMerge, id);
     if (errorValidacion) throw new Error(errorValidacion);
 
-    await storage.updateTurno(id, datos);
+    await api.put(`/turnos/${id}`, datos);
     await cargarTurnos();
   };
 
   const eliminarTurno = async (id: number): Promise<void> => {
-    await storage.deleteTurno(id);
+    await api.delete(`/turnos/${id}`);
     await cargarTurnos();
   };
 
   const cambiarEstado = async (id: number, estado: 'activo' | 'inactivo'): Promise<void> => {
-    await storage.toggleTurnoEstado(id, estado);
+    if (estado === 'inactivo') {
+      await api.delete(`/turnos/${id}`);
+    } else {
+      await api.patch(`/turnos/${id}/toggle`);
+    }
     await cargarTurnos();
   };
 
@@ -113,18 +110,13 @@ export const useTurnos = () => {
   };
 
   return {
-    // Estado
     turnos,
     cargando,
     error,
-
-    // Acciones CRUD
     crearTurno,
     editarTurno,
     eliminarTurno,
     cambiarEstado,
-
-    // Utilidades
     getDisponibilidad,
     recargar: cargarTurnos,
   };

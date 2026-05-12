@@ -20,10 +20,14 @@ export const validateReservaCreate = (
 
   if (!nombreCliente?.trim()) {
     errores.push('El nombre del cliente es obligatorio');
+  } else if (nombreCliente.trim().length < 3) {
+    errores.push('El nombre debe tener al menos 3 caracteres');
   }
 
   if (!carnetIdentidad?.trim()) {
     errores.push('El carnet de identidad es obligatorio');
+  } else if (carnetIdentidad.trim().length !== 11) {
+    errores.push('El carnet debe tener 11 caracteres');
   }
 
   if (errores.length > 0) {

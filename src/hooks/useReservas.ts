@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useStorage } from './useStorage';
-import type { FormularioReserva,ReservaConTurno } from '../types';
-
-
+import { api } from '../services/api';
+import type { FormularioReserva, ReservaConTurno } from '../types';
 
 export const useReservas = () => {
 
@@ -10,21 +8,18 @@ export const useReservas = () => {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const storage = useStorage();
-
   const cargarReservas = useCallback(async () => {
     try {
       setCargando(true);
       setError(null);
-      const data = await storage.getReservasConTurno();
-      // Ordenar: confirmadas primero, luego por fecha de reserva descendente
+      const data = await api.get<ReservaConTurno[]>('/reservas');
       const ordenadas = data.sort((a, b) => {
         if (a.estado === b.estado) {
           return new Date(b.fechaReserva).getTime() - new Date(a.fechaReserva).getTime();
         }
         return a.estado === 'confirmada' ? -1 : 1;
       });
-      setReservas(ordenadas as ReservaConTurno[]);
+      setReservas(ordenadas);
     } catch {
       setError('Error al cargar las reservas');
     } finally {
@@ -32,7 +27,6 @@ export const useReservas = () => {
     }
   }, []);
 
-  // Carga inicial al montar el hook
   useEffect(() => {
     cargarReservas();
   }, [cargarReservas]);
@@ -41,8 +35,6 @@ export const useReservas = () => {
     turnoId: number,
     datos: FormularioReserva
   ): Promise<number> => {
-
-    // Validaciones del formulario
     if (!datos.nombreCliente.trim()) {
       throw new Error('El nombre del cliente es obligatorio');
     }
@@ -50,14 +42,11 @@ export const useReservas = () => {
       throw new Error('El carnet de identidad es obligatorio');
     }
 
-    // Verificación optimista: contar reservas confirmadas locales
-    // para dar un error rápido sin esperar a IndexedDB
     const reservasConfirmadasLocales = reservas.filter(
       (r) => r.turnoId === turnoId && r.estado === 'confirmada'
     ).length;
 
     if (reservasConfirmadasLocales > 0) {
-      // Verificamos también si el cliente ya tiene una reserva en este turno
       const yaReservado = reservas.some(
         (r) =>
           r.turnoId === turnoId &&
@@ -69,7 +58,7 @@ export const useReservas = () => {
       }
     }
 
-    const id = await storage.addReserva({
+    const reserva = await api.post<{ id: number }>('/reservas', {
       ...datos,
       nombreCliente: datos.nombreCliente.trim(),
       carnetIdentidad: datos.carnetIdentidad.trim(),
@@ -77,8 +66,9 @@ export const useReservas = () => {
     });
 
     await cargarReservas();
-    return id;
+    return reserva.id;
   };
+
   const cancelarReserva = async (id: number): Promise<void> => {
     const reserva = reservas.find((r) => r.id === id);
 
@@ -89,7 +79,7 @@ export const useReservas = () => {
       throw new Error('La reserva ya está cancelada');
     }
 
-    await storage.cancelReserva(id);
+    await api.patch(`/reservas/${id}/cancelar`);
     await cargarReservas();
   };
 
@@ -108,21 +98,14 @@ export const useReservas = () => {
   };
 
   return {
-    // Estado
     reservas,
     cargando,
     error,
     estadisticas,
-
-    // Acciones
     crearReserva,
     cancelarReserva,
-
-    // Consultas
     getReservasPorTurno,
     getReservasPorCliente,
-
-    // Utilidad
     recargar: cargarReservas,
   };
 };

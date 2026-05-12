@@ -1,5 +1,14 @@
 {
-  "turnos": [],
+  "turnos": [
+    {
+      "id": 1,
+      "fecha": "2026-05-13",
+      "horaInicio": "14:00",
+      "horaFin": "15:00",
+      "capacidadMaxima": 5,
+      "estado": "activo"
+    }
+  ],
   "reservas": [],
   "usuarios": [
     {
@@ -10,7 +19,7 @@
     }
   ],
   "contadores": {
-    "turnos": 0,
+    "turnos": 1,
     "reservas": 0,
     "usuarios": 1
   }

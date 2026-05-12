@@ -72,7 +72,7 @@ export const FormularioTurno = ({
     if (!datos.horaFin) return 'La hora de fin es obligatoria';
     if (datos.horaInicio >= datos.horaFin) return 'La hora de inicio debe ser anterior a la de fin';
     if (!datos.capacidadMaxima || datos.capacidadMaxima < 1) return 'La capacidad debe ser al menos 1';
-    if (datos.capacidadMaxima > 100) return 'La capacidad no puede superar 100';
+    if (datos.capacidadMaxima > 5) return 'La capacidad máxima es de 5 cupos';
     return null;
   };
 

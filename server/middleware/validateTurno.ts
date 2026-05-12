@@ -36,6 +36,8 @@ export const validateTurnoCreate = (
 
   if (capacidadMaxima === undefined || capacidadMaxima <= 0) {
     errores.push('La capacidad debe ser mayor a 0');
+  } else if (capacidadMaxima > 5) {
+    errores.push('La capacidad máxima es de 5 cupos');
   }
 
   if (horaInicio && horaFin && horaInicio >= horaFin) {
@@ -72,6 +74,8 @@ export const validateTurnoUpdate = (
 
   if (capacidadMaxima !== undefined && capacidadMaxima <= 0) {
     errores.push('La capacidad debe ser mayor a 0');
+  } else if (capacidadMaxima !== undefined && capacidadMaxima > 5) {
+    errores.push('La capacidad máxima es de 5 cupos');
   }
 
   if (
